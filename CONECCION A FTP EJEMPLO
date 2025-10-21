@@ -1,0 +1,35 @@
+<?php
+// 1. Configuración de conexión FTP
+$ftp_server = "ftp.ejemplo.com";
+$ftp_user = "tu_usuario";
+$ftp_pass = "tu_contraseña";
+
+// 2. Datos del archivo subido (recibidos desde el frontend)
+$nombre_archivo_local = $_FILES['archivo_imagen']['tmp_name'];
+$nombre_archivo_remoto = "/public_html/images/" . $_FILES['archivo_imagen']['name'];
+
+// 3. Establecer conexión con el servidor FTP
+$conn_id = ftp_connect($ftp_server);
+
+// 4. Iniciar sesión
+$login_result = ftp_login($conn_id, $ftp_user, $ftp_pass);
+
+// 5. Subir el archivo
+if ((!$conn_id) || (!$login_result)) {
+    echo "La conexión FTP falló";
+    exit;
+} else {
+    // 6. Habilitar modo pasivo
+    ftp_pasv($conn_id, true);
+
+    // 7. Subir el archivo
+    if (ftp_put($conn_id, $nombre_archivo_remoto, $nombre_archivo_local, FTP_BINARY)) {
+        echo "El archivo se subió correctamente.";
+    } else {
+        echo "Hubo un error al subir el archivo.";
+    }
+}
+
+// 8. Cerrar conexión
+ftp_close($conn_id);
+?>
